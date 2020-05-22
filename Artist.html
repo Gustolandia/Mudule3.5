@@ -271,7 +271,7 @@
         .bandInfo::before{
             content:"";
             filter: brightness(40%);
-            background: url(https://www.queenonline.com/global/uploads/p05lgv2z.jpg);
+            /* background: url(https://www.queenonline.com/global/uploads/p05lgv2z.jpg); */
             opacity:0.25;
             background-size: cover;
             top:0;
@@ -486,7 +486,7 @@
         <div class="container albumList">
             <div class="overview" style="display:block">
              <h2 class="mt-3">Albums</h2>
-             <div class="row m-4">
+             <div class="row m-4 fetchArtist">
                  <div class="col col-12 col-sm-6 col-md-3 col-lg-2 d-flex align-items-sm-stretch mb-4">
                     <a class="w-100"><div class="card h-100">
                         <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/en/6/6c/Bohemian_Rhapsody_soundtrack.jpg" alt="Bohemian">
@@ -964,7 +964,67 @@
             audio2.currentTime=sTime*audio2.duration/100;
             }
         
+
+        ///**************************************//////////////////////////////
+
+        window.onload = () => {
+            getArtist()
+        }
+
+        let mainView = document.querySelector('.fetchArtist')
+
+        const getArtist = () => {
+
+            mainView.innerHTML = ''
+
+            const url = `https://deezerdevs-deezer.p.rapidapi.com/search?q=eminem`
+
+            fetch(url, {
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
+                "x-rapidapi-key": "5a59d0425fmsh5f3822ebf9b2e14p17343ajsn307759a80b6e"
+            }
+            })
+            .then(res => res.json())
+            .then(output => {
+                document.querySelector('.bandInfo').style.backgroundImage = 'none'
+                document.querySelector('.bandInfo').style.background = `url(${output.data[0].artist.picture_xl})`
+                document.querySelector('.bandInfo h1').innerHTML = output.data[0].artist.name
+                //console.log(output.data.artist.picture) 
+                for (let x = 0; x < output.data.length; x++) {
+                const element = output.data[x];
+                console.log(element.artist.name)
+                console.log(element.artist.picture)
+                //console.log(element.artist.tracklist)
+                console.log(element.album.title)
+                console.log(element.album.id)
+
+
+                mainView.innerHTML += 
+                `<div class="col col-12 col-sm-6 col-md-3 col-lg-2 d-flex align-items-sm-stretch mb-4">
+                    <a class="w-100" href="album.html?id=${element.album.id}">
+                        <div class="card h-100">
+                            <img class="card-img-top" src=${element.album.cover} alt=${element.album.title}>
+                            <div class="card-body">
+                                <p class="musicName card-text text-center mb-2">${element.album.title}</p>
+                                <p class="bandName card-text text-center text-muted">${element.artist.name}</p>
+                            </div>
+                        </div>
+                    </a>
+                 </div>
+                `
+
+            }
+                
+            }).catch(err => {
+            console.error('Error: ', err);
+            alert(err);
+        });
+      }
+
     </script>
+
 </body>
     
 </html>
