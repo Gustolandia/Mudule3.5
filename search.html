@@ -21,8 +21,8 @@
 <body>
     <input id="myOutputAlbum" placeholder="Song" style="width:50%; position:absolute;right:0;top:2.5rem">
 
-
-    <input id="myOutputArtist" placeholder="Song" style="width:50%; position:absolute;right:0;top:5rem">
+<!-- 2nd is artist page search -->
+    <input id="myOutputArtist" placeholder="Song" style="width:50%; position:absolute;right:0;top:5rem"> 
     <script>
     window.onload = function (){
         readAlbum();
@@ -83,7 +83,7 @@
 }
 
 
-
+// Artist page after this
 function readArtist(){
     let input2 = document.getElementById("myOutputArtist");
     input2.addEventListener("keyup", function(event2) {
@@ -97,6 +97,7 @@ function readArtist(){
 let ArtistArray=[];
 let Artist='';
 let albumArray=[];
+let finalArraySS=[];
 
 function searchArtist(a){
     let searchRes="https://deezerdevs-deezer.p.rapidapi.com/search?q="+a;
@@ -149,6 +150,7 @@ function filterArtist(b){
 
                 ArtistArray=v1.data.filter(compareArtist);
                 console.log(ArtistArray);
+                finalArraySS=ArtistArray;
                 return ArtistArray;
             })
 
@@ -163,8 +165,6 @@ function compareArtist(el1){
     let vvv2=true;
     for (let i=0; i<albumArray.length;i++){
         vvv2= (vvv2&&!albumArray[i].album.title.toLowerCase().includes(el1.album.title.toLowerCase()));
-        console.log(albumArray[i].album.title.toLowerCase());
-        console.log(el1.album.title.toLowerCase());
     }
     albumArray.push(el1);
     return vvv&&vvv2;
