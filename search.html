@@ -76,11 +76,6 @@
         });
     }
 
-    window.onload = function (){
-    readArtist()
-    
-    
-}
 
 
 // Artist page after this
@@ -150,7 +145,7 @@ function filterArtist(b){
 
                 ArtistArray=v1.data.filter(compareArtist);
                 console.log(ArtistArray);
-                finalArraySS=ArtistArray;
+                nameoffunction(ArtistArray);
                 return ArtistArray;
             })
 
