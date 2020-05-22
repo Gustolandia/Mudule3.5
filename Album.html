@@ -472,7 +472,7 @@
     </nav>
       
     <div role="main" class="container-fluid main-content">
-        <input id="myInputArtist" placeholder="Artist" style="width:50%; position:absolute;right:0;top:2.5rem">
+        <input id="myOutputAlbum" placeholder="Song" style="width:50%; position:absolute;right:0;top:2.5rem">
         <div class="row m-0">
             
             <div id="display-album" class="col-12 col-md-5 d-flex justify-content-center">
@@ -629,20 +629,23 @@
 
     </footer>
     <script>
-    function addNewList(a){
+    let obj=[];
+    function addNewList(b){
         
-        let searchRes="https://deezerdevs-deezer.p.rapidapi.com/search?q="+a;
+        let searchRes="https://deezerdevs-deezer.p.rapidapi.com/album/"+b;
         
         fetch(searchRes, {
 	    "method": "GET",
 	    "headers": {
 		"x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
 		"x-rapidapi-key": "4f5d2c7e7fmsh25bac9519881221p1a5a2ajsn734f8cc02d07"
-	}
-    })
+	    }
+        })
         .then(response => {
             response.json()
-            .then(v1=>{
+            .then(v3=>{
+                obj=v3
+                console.log(v3);
                 let list=document.getElementById("musicList");
                 let audio=document.getElementById("main_audio");
                 let music=document.querySelector("#main_audio source")
@@ -650,8 +653,8 @@
                 for (let i=0;i<previousL.length;i++){
                     previousL[i].remove();
                 }
-                console.log(v1);
-                v1.data.forEach (v2=>{
+                
+                v3.tracks.data.forEach (v2=>{
                 let listElement=document.createElement("LI");
                 listElement.addEventListener('click', function(){
                     music.src=v2.preview;
@@ -675,9 +678,7 @@
                 trackDiv.appendChild(p2nd);
                 p1st.innerHTML='<i class="fa fa-music pr-3"></i>'+v2.title;
                 p2nd.innerText=v2.duration;
-                mySmall.innerText=v2.album.title;
                 let imageAlbum=document.getElementById("albumImage");
-                imageAlbum.src=v2.artist.picture_big;
             })
 
             });
@@ -724,13 +725,7 @@
         }
         window.onload = function (){
 
-            var input1 = document.getElementById("myInputArtist");
-            input1.addEventListener("keyup", function(event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                addNewList(input1.value);
-            }
-            });
+            readAlbum();
 
              //other function -- set total time duration
             totalTime()
@@ -739,6 +734,54 @@
             isPlaying()
             
         }
+
+
+        let Album='';
+        function readAlbum(){
+        let input1 = document.getElementById("myOutputAlbum");
+        input1.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            console.log("here");
+            searchAlbum(input1.value);
+        }
+        });
+    }
+    
+    
+
+    function searchAlbum(a){
+        let searchRes="https://deezerdevs-deezer.p.rapidapi.com/search?q="+a;
+        
+        fetch(searchRes, {
+	    "method": "GET",
+	    "headers": {
+		"x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
+		"x-rapidapi-key": "4f5d2c7e7fmsh25bac9519881221p1a5a2ajsn734f8cc02d07"
+	        }
+        })
+        .then(response => {
+            response.json()
+            .then(v1=>{
+                let i=-1;
+                do{
+                    i+=1;
+                    if (i>=v1.data.length){
+                        console.log('NOT A SONG');
+                        return 0;
+                    }
+                    Album=v1.data[i].album.id;
+                    
+                } while (a.toLowerCase()!=v1.data[i].title.toLowerCase());
+                console.log(Album);
+                addNewList(Album);
+                return Album;
+            });
+            })
+        .catch(err => {
+	    console.log(err);
+        });
+    }
         
         function updateTextInput(sTime){
             let audio2=document.querySelector("#main_audio");
