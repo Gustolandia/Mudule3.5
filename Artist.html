@@ -483,11 +483,15 @@
                 </div>
             </nav>
         </div>
+        
+<!-- artist page search -->
+    <input id="myOutputArtist" placeholder="Song" style="width:50%; position:absolute;right:0;top:5rem"> 
+
         <div class="container albumList">
             <div class="overview" style="display:block">
              <h2 class="mt-3">Albums</h2>
              <div class="row m-4 fetchArtist">
-                 <div class="col col-12 col-sm-6 col-md-3 col-lg-2 d-flex align-items-sm-stretch mb-4">
+                 <!-- <div class="col col-12 col-sm-6 col-md-3 col-lg-2 d-flex align-items-sm-stretch mb-4">
                     <a class="w-100"><div class="card h-100">
                         <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/en/6/6c/Bohemian_Rhapsody_soundtrack.jpg" alt="Bohemian">
                         <div class="card-body">
@@ -594,11 +598,12 @@
                             <p class="bandName card-text text-center text-muted">Queen</p>
                         </div>
                     </div></a>
-                 </div>
+                 </div> -->
              </div>
             </div>
+        </div>
 
-            <div class="relatedArtists" style="display: none;">
+            <!-- <div class="relatedArtists" style="display: none;">
              <h2 class="mt-3">Related Artists</h2>
              <div class="row m-4">
                  <div class="col col-12 col-sm-6 col-md-3 col-lg-2 d-flex align-items-sm-stretch mb-4">
@@ -715,7 +720,7 @@
 
 
 
-        </div>       
+        </div>        -->
     </main>
 
     <nav class="navbar navbar-expand-md navbar-dark mr-0" id="sideBlack">
@@ -880,6 +885,7 @@
         });
 
         window.onload = function (){
+
             let arrayOfAs=document.querySelectorAll("#main-nav-collapse li a");
             for (let i1=0;i1<arrayOfAs.length; i1++){
                 arrayOfAs[i1].addEventListener('click',function(event){
@@ -969,11 +975,129 @@
 
         window.onload = () => {
             getArtist()
+            readArtist()
         }
 
-        let mainView = document.querySelector('.fetchArtist')
+        
+// Artist page after this
+function readArtist(){
+    let input2 = document.getElementById("myOutputArtist");
+    input2.addEventListener("keyup", function(event2) {
+    if (event2.keyCode === 13) {
+        event2.preventDefault();
+        searchArtist(input2.value);
+    }
+    });
+}
 
-        const getArtist = () => {
+let ArtistArray=[];
+let Artist='';
+let albumArray=[];
+let finalArraySS=[];
+
+function searchArtist(a){
+    let searchRes="https://deezerdevs-deezer.p.rapidapi.com/search?q="+a;
+    
+    fetch(searchRes, {
+    "method": "GET",
+    "headers": {
+    "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
+    "x-rapidapi-key": "4f5d2c7e7fmsh25bac9519881221p1a5a2ajsn734f8cc02d07"
+        }
+    })
+    .then(response => {
+        response.json()
+        .then(v1=>{
+            let i=-1;
+            console.log(v1);
+            albumArray.push(v1.data[20]);
+            do{
+                i+=1;
+                if (i>=v1.data.length){
+                    console.log('NOT A SONG');
+                    return [];
+                }
+                Artist=v1.data[i].artist.name.toLowerCase();
+                
+                
+            } while (a.toLowerCase()!=v1.data[i].title.toLowerCase());
+            console.log(Artist);
+            return filterArtist(Artist);
+        })
+    
+    })
+    .catch(err => {
+    console.log(err);
+    });
+}
+let obj=[]
+function filterArtist(b){
+    fetch("https://deezerdevs-deezer.p.rapidapi.com/search?q="+b, {
+            "method": "GET",
+            "headers": {
+            "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
+            "x-rapidapi-key": "4f5d2c7e7fmsh25bac9519881221p1a5a2ajsn734f8cc02d07"
+            }
+            })
+        .then(response => {
+            response.json()
+            .then(v1=>{
+                obj=v1;
+
+                ArtistArray=v1.data.filter(compareArtist);
+                console.log(ArtistArray);
+                finalArraySS=ArtistArray;
+                //return ArtistArray;
+
+                
+            let mainView = document.querySelector('.fetchArtist')
+
+            mainView.innerHTML = ''
+
+            document.querySelector('.bandInfo').style.background = `url(${ArtistArray[0].artist.picture_xl})`
+            document.querySelector('.bandInfo h1').innerHTML = ArtistArray[0].artist.name
+
+            ArtistArray.forEach(element => {
+                console.log(element)
+                mainView.innerHTML += 
+                `<div class="col col-12 col-sm-6 col-md-3 col-lg-2 d-flex align-items-sm-stretch mb-4">
+                    <a class="w-100" href="album.html?id=${element.album.id}">
+                        <div class="card h-100">
+                            <img class="card-img-top" src=${element.album.cover} alt=${element.album.title}>
+                            <div class="card-body">
+                                <p class="musicName card-text text-center mb-2">${element.album.title}</p>
+                                <p class="bandName card-text text-center text-muted">${element.artist.name}</p>
+                            </div>
+                        </div>
+                    </a>
+                 </div>
+                `
+            });
+
+                
+            })
+
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+function compareArtist(el1){
+    let vvv= (el1.artist.name.toLowerCase() === Artist.toLowerCase());
+    console.log(vvv)
+    let vvv2=true;
+    for (let i=0; i<albumArray.length;i++){
+        vvv2= (vvv2&&!albumArray[i].album.title.toLowerCase().includes(el1.album.title.toLowerCase()));
+    }
+    albumArray.push(el1);
+    return vvv&&vvv2;
+}
+
+
+        let mainView = document.querySelector('.fetchArtist')
+        
+        let getArtist = () => {
+
 
             mainView.innerHTML = ''
 
