@@ -118,8 +118,8 @@
     <div class="container-fluid fixed-bottom bg-container pt-1">
       <div class="row">
         <div class="col-lg-10 offset-lg-2">
-          <div class="row">
-            <div
+          <div class="row d-flex justify-content-center" id="audio">
+            <!-- <div
               class="col-6 col-md-4 col-lg-2 offset-3 offset-md-4 offset-lg-5 playerControls mt-1"
             >
               <div class="row">
@@ -139,7 +139,7 @@
                   <img src="playerbuttons/Repeat.png" alt="shuffle" />
                 </a>
               </div>
-            </div>
+            </div> -->
           </div>
           <div class="row justify-content-center playBar py-3">
             <div class="col-8 col-md-6">
@@ -200,7 +200,7 @@
       let displayAlbum = (albumInfo) => {
           return`
             <div class="col-sm-auto col-md-3 text-center mb-5">
-                <a href="/album_page.html?id=${albumInfo.album.id}">
+                <a href="album_page.html?id=${albumInfo.album.id}">
                     <img
                     class="img-fluid"
                     src=${albumInfo.album.cover_medium} alt="img of ${albumInfo.album.title}"
@@ -209,7 +209,7 @@
                 <p>
                     <a href="#"> Track: ${albumInfo.title} </a>
                     <br>
-                    <a href="#" class="wrap">
+                    <a href="album_page.html?id=${albumInfo.album.id}" class="wrap">
                     Album: ${albumInfo.album.title}
                     </a>
                 </p>
@@ -243,12 +243,13 @@
                 mainHeader.style.background = `url(${artist.picture_big})`
                 mainHeader.innerHTML += displayHead(artist);
                 
-                fetch("https://deezerdevs-deezer.p.rapidapi.com/search?q="+artist.name, {
+                fetch("https://deezerdevs-deezer.p.rapidapi.com/artist/"+artistId+"/top?limit=50", {
                 method: "GET",
                 headers,
                 })
                 .then((response) => {
                     if (response.ok) {
+                      console.log(response)
                     return response.json();
                     }
                 })
@@ -261,12 +262,37 @@
                         div.innerHTML += displayAlbum(element);
                         
                     }
-                    console.log(artistAlbum)
+                    //console.log(artistAlbum)
                 })
 
           });
+
+          (function() {
+          
+          let audio = document.querySelector("#audio");
+              audio.innerHTML += 
+              `
+              <div class="deezer-widget-player" data-src="https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=true&width=700&height=350&color=ff0000&layout=dark&size=medium&type=radio&id=artist-${artistId}&app_id=1" 
+              data-scrolling="no" data-frameborder="0" data-allowTransparency="true" data-width="700" data-height="350"></div>
+                `
+  
+          var w = document[typeof document.getElementsByClassName === 'function' ? 'getElementsByClassName' : 'querySelectorAll']('deezer-widget-player');
+          for (var i = 0, l = w.length; i < l; i++) {
+            w[i].innerHTML = '';
+            var el = document.createElement('iframe');
+            el.src = w[i].getAttribute('data-src');
+            el.scrolling = w[i].getAttribute('data-scrolling');
+            el.frameBorder = w[i].getAttribute('data-frameborder');
+            el.setAttribute('frameBorder', w[i].getAttribute('data-frameborder'));
+            el.allowTransparency = w[i].getAttribute('data-allowTransparency');
+            el.width = w[i].getAttribute('data-width');
+            el.height = w[i].getAttribute('data-height');
+            w[i].appendChild(el);
+          }
+            }());
       };
-      //window.onload = function () {};
+          
+      
     </script>
   </body>
 </html>

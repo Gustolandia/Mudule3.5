@@ -111,8 +111,8 @@
     <div class="container-fluid fixed-bottom bg-container pt-1">
       <div class="row">
         <div class="col-lg-10 offset-lg-2">
-          <div class="row">
-            <div
+          <div class="row d-flex justify-content-center" id="audio">
+            <!-- <div
               class="col-6 col-md-4 col-lg-2 offset-3 offset-md-4 offset-lg-5 playerControls mt-1"
             >
               <div class="row">
@@ -132,7 +132,10 @@
                   <img src="playerbuttons/Repeat.png" alt="shuffle" />
                 </a>
               </div>
-            </div>
+              
+            </div> -->
+              <!-- <div class="deezer-widget-player" data-src="https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=true&width=700&height=350&color=ff0000&layout=dark&size=medium&type=album&id=51350192&app_id=1" 
+              data-scrolling="no" data-frameborder="0" data-allowTransparency="true" data-width="700" data-height="350"></div> -->
           </div>
           <div class="row justify-content-center playBar py-3">
             <div class="col-8 col-md-6">
@@ -182,7 +185,7 @@
           <p class="album-title">${album.label}</p>
         </div>
         <div class="text-center">
-          <a href="/artist_page.html?id=${album.artist.id}"><p class="artist-name">${album.artist.name}</p></a>
+          <a href="artist_page.html?id=${album.artist.id}"><p class="artist-name">${album.artist.name}</p></a>
         </div>
         <div class="mt-4 text-center">
           <button id="btnPlay" class="btn btn-success" type="button">
@@ -200,10 +203,11 @@
             style="color: white;"
             >${song.title}</a>
           <small class="duration pr-3" style="color: white;"
-            >${song.duration}</small>
+            >${(song.duration / 60).toFixed(2)}</small>
         </div>
         `;
       };
+
 
       window.onload = function () {
         let albumId = new URLSearchParams(document.location.search).get("id");
@@ -226,7 +230,14 @@
           .then((album) => {
             let imgContainer = document.querySelector("#img-container");
             imgContainer.innerHTML += albumArt(album);
-            console.log(albumArt(album))
+            console.log(album)
+            
+            
+
+            // for (let i = 0; i < album.tracks.data.length; i++) {
+            //     const element = album.tracks.data[i];
+            //     console.log(element.preview)
+            // }
 
             let trackList = document.querySelector("#trackList");
             for (let i = 0; i < album.tracks.data.length; i++) {
@@ -235,6 +246,33 @@
               trackList.appendChild(div);
             }
           });
+
+          
+
+          
+        (function() {
+            
+          let audio = document.querySelector("#audio");
+              audio.innerHTML += 
+              `
+                <div class="deezer-widget-player" data-src="https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=true&width=700&height=350&color=ff0000&layout=dark&size=medium&type=album&id=${albumId}&app_id=1" 
+                data-scrolling="no" data-frameborder="0" data-allowTransparency="true" data-width="700" data-height="350"></div>
+                `
+
+          var w = document[typeof document.getElementsByClassName === 'function' ? 'getElementsByClassName' : 'querySelectorAll']('deezer-widget-player');
+          for (var i = 0, l = w.length; i < l; i++) {
+            w[i].innerHTML = '';
+            var el = document.createElement('iframe');
+            el.src = w[i].getAttribute('data-src');
+            el.scrolling = w[i].getAttribute('data-scrolling');
+            el.frameBorder = w[i].getAttribute('data-frameborder');
+            el.setAttribute('frameBorder', w[i].getAttribute('data-frameborder'));
+            el.allowTransparency = w[i].getAttribute('data-allowTransparency');
+            el.width = w[i].getAttribute('data-width');
+            el.height = w[i].getAttribute('data-height');
+            w[i].appendChild(el);
+          }
+            }());
       };
     </script>
   </body>
